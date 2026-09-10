@@ -45,7 +45,7 @@ const t=copy[language],routes=useMemo(()=>trip?findRoutes(trip.from,trip.to,trip
 useEffect(()=>{document.documentElement.lang=language;
 document.documentElement.dataset.system=isMetrobus?'metrobus':'metro';
 document.documentElement.dataset.theme=theme},[language,theme]);
-useEffect(()=>{const timer=setTimeout(()=>setPageLoading(false),1000);
+useEffect(()=>{const timer=setTimeout(()=>setPageLoading(false),1800);
 return()=>clearTimeout(timer)},[]);
 useEffect(()=>{const update=()=>setMobile(window.innerWidth<=760);window.addEventListener('resize',update);return()=>window.removeEventListener('resize',update)},[]);
 function submit(e){e.preventDefault();
@@ -53,7 +53,7 @@ if(!stations.includes(from)||!stations.includes(to)){setError(t.error);
 return}setError('');
 setLoading(true);
 setSelected(0);
-setTimeout(()=>{setTrip({from,to,mode});setLoading(false)},450)}return <>{pageLoading&&<PageLoader/>}
+setTimeout(()=>{setTrip({from,to,mode});setLoading(false)},900)}return <>{pageLoading&&<PageLoader/>}
 <header>
 <a className="brand" href="./">
 <img className="brand-icon" src="/logo.svg" alt=""/>
