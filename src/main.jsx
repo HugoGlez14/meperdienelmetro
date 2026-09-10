@@ -14,6 +14,7 @@ import MetroUpdates from './MetroUpdates';
 import LinesCatalog from './LinesCatalog';
 import ServiceInfo from './ServiceInfo';
 import SiteControls,{CityClock} from './SiteControls';
+import MetrobusPlanner from './MetrobusPlanner';
 
 const copy={es:{tag:'MENOS VUELTAS. MÁS CIUDAD.',head:'Piérdete en la ciudad.',accent:'No en el Metro.',from:'Estoy en',to:'Quiero ir a',fast:'Menor tiempo',few:'Menos cambios',find:'Encontrar mi ruta',empty:'Tu próxima ruta empieza aquí',emptyText:'Selecciona dónde estás y a dónde quieres ir para ver tu recorrido.',trip:'TU PRÓXIMO VIAJE',recommended:'Recomendada',alternative:'Alternativa',time:'tiempo estimado',stops:'estaciones por recorrer',transfer:'transbordo',transfers:'transbordos',steps:'Tu ruta, paso a paso',error:'Selecciona dos estaciones de la lista para encontrar tu ruta.'},en:{tag:'FEWER TURNS. MORE CITY.',head:'Get lost in the city.',accent:'Not in the Metro.',from:'I am at',to:'I want to go to',fast:'Fastest route',few:'Fewer transfers',find:'Find my route',empty:'Your next route starts here',emptyText:'Choose where you are and where you want to go to see your route.',trip:'YOUR NEXT TRIP',recommended:'Recommended',alternative:'Alternative',time:'estimated time',stops:'stops to travel',transfer:'transfer',transfers:'transfers',steps:'Your route, step by step',error:'Choose two stations from the list to find your route.'}};
 
@@ -60,6 +61,7 @@ setTimeout(()=>{setTrip({from,to,mode});setLoading(false)},450)}return <>{pageLo
 </a>
 <nav className="main-nav">
 <a href="#route">{language==='en'?'Route':'Ruta'}</a>
+<a href="#metrobus">Metrobús</a>
 <a href="#stations">{language==='en'?'Stations':'Estaciones'}</a>
 <a href="#service">{language==='en'?'Service':'Servicio'}</a>
 </nav>
@@ -175,6 +177,7 @@ setTo(from)}}>
 <p>{t.emptyText}</p>
 </div>}</section>
 </div>
+<div id="metrobus"><MetrobusPlanner/></div>
 <section id="service">
 <ServiceInfo/>
 </section>
