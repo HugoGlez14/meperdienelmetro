@@ -43,6 +43,7 @@ function App(){const [from,setFrom]=useState(''),[to,setTo]=useState(''),[mode,s
 const isMetrobus=window.location.pathname.replace(/\/$/,'')==='/metrobus';
 const t=copy[language],routes=useMemo(()=>trip?findRoutes(trip.from,trip.to,trip.mode):[],[trip]),route=routes[selected]||routes[0];
 useEffect(()=>{document.documentElement.lang=language;
+document.documentElement.dataset.system=isMetrobus?'metrobus':'metro';
 document.documentElement.dataset.theme=theme},[language,theme]);
 useEffect(()=>{const timer=setTimeout(()=>setPageLoading(false),1000);
 return()=>clearTimeout(timer)},[]);
