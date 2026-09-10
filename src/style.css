@@ -505,7 +505,7 @@ form{padding:20px}
 
 
 
-@media(max-width:760px){header{height:78px;padding:0 20px}
+@media(max-width:760px){header{height:auto;min-height:78px;padding:10px 20px;display:grid;grid-template-columns:minmax(0,1fr) auto;row-gap:10px}
 
 
 
@@ -740,7 +740,7 @@ html[data-theme='dark'] .map-viewport,html[data-theme='dark'] .network-map,html[
 html[data-theme='dark'] .route-audio,html[data-theme='dark'] .native-languages{background:#243a30;border-color:#3b574a}
 html[data-theme='dark'] .intro>p,html[data-theme='dark'] .side-note p,html[data-theme='dark'] .catalog-heading>p,html[data-theme='dark'] .service-card p:not(.eyebrow),html[data-theme='dark'] .update-card p,html[data-theme='dark'] .native-languages p:not(.eyebrow){color:#b9c7bc}
 html[data-theme='dark'] header,html[data-theme='dark'] footer,html[data-theme='dark'] .network{border-color:#344a40}
-@media(max-width:760px){.main-nav{display:none}
+@media(max-width:760px){.main-nav{display:flex;grid-column:1/-1;order:3;width:max-content;margin:0;gap:0;border:1px solid #dce3da;border-radius:8px;overflow:hidden;background:white}.main-nav a{padding:7px 13px;font-size:12px;font-weight:700}.main-nav a+a{border-left:1px solid #dce3da}.main-nav a.active{background:#eef3ea}
 .header-tools{gap:7px}
 .city-clock{display:none}
 .site-controls select{max-width:78px}
