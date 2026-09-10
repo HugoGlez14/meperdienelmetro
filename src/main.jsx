@@ -25,25 +25,26 @@ function PageLoader(){return <div className="page-loader" role="status" aria-liv
 <p className="loader-copy">Conectando las líneas de la ciudad</p>
 <span className="sr-only">Cargando meperdienelmetro</span>
 </div>}
-function Picker({label,value,onChange,id,icon}){const [open,setOpen]=useState(false);
+function Picker({label,value,onChange,id,icon,mobile}){const [open,setOpen]=useState(false);
 return <div className="picker">
 <label>{label}</label>
-<div className="input-wrap">{icon}<input aria-label={label} value={value} onFocus={()=>setOpen(true)} onBlur={()=>setTimeout(()=>setOpen(false),150)} onChange={e=>{onChange(e.target.value);
+<div className="input-wrap">{icon}<input aria-label={label} value={value} readOnly={mobile} inputMode={mobile?'none':undefined} onClick={()=>setOpen(true)} onFocus={()=>setOpen(true)} onBlur={()=>!mobile&&setTimeout(()=>setOpen(false),150)} onChange={e=>{onChange(e.target.value);
 setOpen(true)}}/>
 <ChevronDown size={17}/>
-</div>{open&&<div className="options" id={id}>{stations.filter(s=>normalize(s).includes(normalize(value))).map(s=>
+</div>{open&&<div className={'options'+(mobile?' options-mobile':'')} id={id}>{mobile&&<div className="options-mobile-heading"><strong>{label}</strong><button type="button" onClick={()=>setOpen(false)}>Cerrar</button></div>}{stations.filter(s=>normalize(s).includes(normalize(value))).map(s=>
 <button type="button" key={s} onMouseDown={e=>e.preventDefault()} onClick={()=>{onChange(s);
 setOpen(false)}}>
 <span>{s}</span>
 <span>{stationLines(s).map(l=>
 <Badge key={l.id} line={l}/>)}</span>
 </button>)}</div>}</div>}
-function App(){const [from,setFrom]=useState(''),[to,setTo]=useState(''),[mode,setMode]=useState('fast'),[trip,setTrip]=useState(null),[error,setError]=useState(''),[selected,setSelected]=useState(0),[language,setLanguage]=useState('es'),[theme,setTheme]=useState('light'),[loading,setLoading]=useState(false),[pageLoading,setPageLoading]=useState(true);
+function App(){const [from,setFrom]=useState(''),[to,setTo]=useState(''),[mode,setMode]=useState('fast'),[trip,setTrip]=useState(null),[error,setError]=useState(''),[selected,setSelected]=useState(0),[language,setLanguage]=useState('es'),[theme,setTheme]=useState('light'),[loading,setLoading]=useState(false),[pageLoading,setPageLoading]=useState(true),[mobile,setMobile]=useState(()=>window.innerWidth<=760);
 const t=copy[language],routes=useMemo(()=>trip?findRoutes(trip.from,trip.to,trip.mode):[],[trip]),route=routes[selected]||routes[0];
 useEffect(()=>{document.documentElement.lang=language;
 document.documentElement.dataset.theme=theme},[language,theme]);
 useEffect(()=>{const timer=setTimeout(()=>setPageLoading(false),1000);
 return()=>clearTimeout(timer)},[]);
+useEffect(()=>{const update=()=>setMobile(window.innerWidth<=760);window.addEventListener('resize',update);return()=>window.removeEventListener('resize',update)},[]);
 function submit(e){e.preventDefault();
 if(!stations.includes(from)||!stations.includes(to)){setError(t.error);
 return}setError('');
@@ -52,9 +53,7 @@ setSelected(0);
 setTimeout(()=>{setTrip({from,to,mode});setLoading(false)},450)}return <>{pageLoading&&<PageLoader/>}
 <header>
 <a className="brand" href="./">
-<span className="brand-icon">
-<TrainFront size={26}/>
-</span>
+<img className="brand-icon" src="/logo.svg" alt=""/>
 <span>meperdi<span className="brand-light">enelmetro</span>
 <span className="brand-dot">.</span>
 </span>
@@ -87,12 +86,12 @@ setTimeout(()=>{setTrip({from,to,mode});setLoading(false)},450)}return <>{pageLo
 <h2>{language==='en'?'Where are we going?':'¿A dónde vamos?'}</h2>
 </div>
 <div className="station-fields">
-<Picker label={t.from} value={from} onChange={setFrom} id="origin" icon={<LocateFixed size={19}/>}/>
+<Picker label={t.from} value={from} onChange={setFrom} id="origin" mobile={mobile} icon={<LocateFixed size={19}/>}/>
 <button className="swap" type="button" onClick={()=>{setFrom(to);
 setTo(from)}}>
 <ArrowDownUp size={17}/>
 </button>
-<Picker label={t.to} value={to} onChange={setTo} id="destination" icon={<MapPin size={19}/>}/>
+<Picker label={t.to} value={to} onChange={setTo} id="destination" mobile={mobile} icon={<MapPin size={19}/>}/>
 </div>
 <fieldset>
 <legend>{language==='en'?'Choose your route':'Elige tu recorrido'}</legend>
