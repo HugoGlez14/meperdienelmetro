@@ -40,6 +40,7 @@ setOpen(false)}}>
 <Badge key={l.id} line={l}/>)}</span>
 </button>)}</div>}</div>}
 function App(){const [from,setFrom]=useState(''),[to,setTo]=useState(''),[mode,setMode]=useState('fast'),[trip,setTrip]=useState(null),[error,setError]=useState(''),[selected,setSelected]=useState(0),[language,setLanguage]=useState('es'),[theme,setTheme]=useState('light'),[loading,setLoading]=useState(false),[pageLoading,setPageLoading]=useState(true),[mobile,setMobile]=useState(()=>window.innerWidth<=760);
+const isMetrobus=window.location.pathname.replace(/\/$/,'')==='/metrobus';
 const t=copy[language],routes=useMemo(()=>trip?findRoutes(trip.from,trip.to,trip.mode):[],[trip]),route=routes[selected]||routes[0];
 useEffect(()=>{document.documentElement.lang=language;
 document.documentElement.dataset.theme=theme},[language,theme]);
@@ -55,22 +56,23 @@ setTimeout(()=>{setTrip({from,to,mode});setLoading(false)},450)}return <>{pageLo
 <header>
 <a className="brand" href="./">
 <img className="brand-icon" src="/logo.svg" alt=""/>
-<span>meperdi<span className="brand-light">enelmetro</span>
+<span>meperdi<span className="brand-light">{isMetrobus?'enelmetrobus':'enelmetro'}</span>
 <span className="brand-dot">.</span>
 </span>
 </a>
 <nav className="main-nav">
-<a href="#route">{language==='en'?'Route':'Ruta'}</a>
-<a href="#metrobus">Metrobús</a>
-<a href="#stations">{language==='en'?'Stations':'Estaciones'}</a>
-<a href="#service">{language==='en'?'Service':'Servicio'}</a>
+<a className={!isMetrobus?'active':''} href="/">Metro</a>
+<a className={isMetrobus?'active':''} href="/metrobus">Metrobús</a>
 </nav>
 <div className="header-tools">
 <CityClock language={language}/>
 <SiteControls language={language} setLanguage={setLanguage} theme={theme} setTheme={setTheme}/>
 </div>
 </header>
-<main>
+<nav className="sub-nav" aria-label="Secciones">
+{isMetrobus?<><a href="#ruta-metrobus">Ruta</a><a href="#estaciones-metrobus">Estaciones</a><a href="#servicio-metrobus">Servicio</a></>:<><a href="#route">{language==='en'?'Route':'Ruta'}</a><a href="#stations">{language==='en'?'Stations':'Estaciones'}</a><a href="#service">{language==='en'?'Service':'Servicio'}</a></>}
+</nav>
+{isMetrobus?<main className="metrobus-only"><MetrobusPlanner mobile={mobile}/><section id="servicio-metrobus" className="metrobus-service"><p className="eyebrow">SERVICIO DE METROBÚS</p><h2>Consulta avisos antes de salir</h2><p>Los horarios y las incidencias pueden cambiar por línea, ruta o día. Revisa los canales oficiales antes de iniciar tu viaje.</p><div><a href="https://www.metrobus.cdmx.gob.mx/dependencia/acerca-de/rutas" target="_blank" rel="noreferrer">Rutas y horarios oficiales <ArrowUpRight size={16}/></a><a href="https://x.com/MetrobusCDMX" target="_blank" rel="noreferrer">Avisos de Metrobús CDMX <ArrowUpRight size={16}/></a></div></section></main>:<main>
 <div className="intro">
 <div>
 <p className="eyebrow">{t.tag}</p>
@@ -177,7 +179,6 @@ setTo(from)}}>
 <p>{t.emptyText}</p>
 </div>}</section>
 </div>
-<div id="metrobus"><MetrobusPlanner/></div>
 <section id="service">
 <ServiceInfo/>
 </section>
@@ -190,10 +191,10 @@ setTo(from)}}>
 <div>{lines.map(l=>
 <Badge key={l.id} line={l}/>)}</div>
 </div>
-</main>
+</main>}
 <footer>
-<span>{language==='en'?'Made to move through CDMX.':'Hecho para moverte por la CDMX.'}</span>
-<span>{language==='en'?'Independent project · Not affiliated with STC Metro':'Proyecto independiente · No afiliado al STC Metro'}</span>
+<span>{isMetrobus?'Hecho para moverte por la CDMX en Metrobús.':language==='en'?'Made to move through CDMX.':'Hecho para moverte por la CDMX.'}</span>
+<span>{isMetrobus?'Proyecto independiente · No afiliado a Metrobús CDMX':language==='en'?'Independent project · Not affiliated with STC Metro':'Proyecto independiente · No afiliado al STC Metro'}</span>
 </footer>
 </>}
 createRoot(document.getElementById('root')).render(<App/>);
