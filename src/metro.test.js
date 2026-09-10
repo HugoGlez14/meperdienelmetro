@@ -1,0 +1,13 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {lines,stations,findRoute,findRoutes} from './metro.js';
+import {stationPositions} from './map-layout.js';
+test('La red incluye las 195 estaciones contadas por línea',()=>assert.equal(lines.reduce((n,l)=>n+l.stations.length,0),195));
+test('Ruta directa y dirección correctas',()=>{const r=findRoute('Balderas','Coyoacán');assert.equal(r.transfers,0);assert.equal(r.stops,8);assert.equal(r.segments[0].direction,'Universidad');});
+test('Transbordo, ruta inversa y extremos',()=>{const r=findRoute('Observatorio','Universidad');assert.ok(r.transfers>0);assert.equal(r.path[0],'Observatorio');assert.equal(r.path.at(-1),'Universidad');assert.equal(findRoute('Universidad','Observatorio').minutes,r.minutes);});
+test('Estación inexistente y origen igual a destino',()=>{assert.equal(findRoute('Nada','Coyoacán'),null);assert.equal(findRoute('Coyoacán','Coyoacán').minutes,0);});
+test('Toda la red está conectada y los tramos son adyacentes',()=>{for(const s of stations){const r=findRoute('Balderas',s);assert.ok(r);for(const seg of r.segments)for(let i=1;i<seg.stations.length;i++)assert.equal(Math.abs(seg.line.stations.indexOf(seg.stations[i])-seg.line.stations.indexOf(seg.stations[i-1])),1);}});
+test('Preferir menos cambios nunca añade transbordos',()=>{for(const a of ['Observatorio','Ciudad Azteca','Tláhuac','La Paz'])for(const b of stations){assert.ok(findRoute(a,b,'transfers').transfers<=findRoute(a,b).transfers);}});
+test('Alternativas distintas, conectadas y sin ciclos',()=>{const routes=findRoutes('Pantitlán','Villa de Cortés');assert.ok(routes.length>1);assert.ok(routes.length<=3);const ids=new Set();for(const r of routes){assert.equal(r.path[0],'Pantitlán');assert.equal(r.path.at(-1),'Villa de Cortés');assert.equal(new Set(r.path).size,r.path.length);ids.add(JSON.stringify(r.segments));for(const s of r.segments)for(let i=1;i<s.stations.length;i++)assert.equal(Math.abs(s.line.stations.indexOf(s.stations[i])-s.line.stations.indexOf(s.stations[i-1])),1);}assert.equal(ids.size,routes.length);});
+test('Alternativas respetan prioridad y casos vacíos',()=>{assert.deepEqual(findRoutes('',''),[]);assert.equal(findRoutes('Balderas','Balderas').length,1);for(const mode of ['fast','transfers']){const r=findRoutes('Observatorio','Ciudad Azteca',mode);assert.equal(r[0][mode==='fast'?'minutes':'transfers'],findRoute('Observatorio','Ciudad Azteca',mode)[mode==='fast'?'minutes':'transfers']);}});
+test('Cada estación tiene una posición fija en el plano',()=>{for(const s of stations){assert.equal(stationPositions[s].length,2);assert.ok(stationPositions[s].every(Number.isFinite));}assert.deepEqual(stationPositions.Pantitlán,[1023,906]);});
