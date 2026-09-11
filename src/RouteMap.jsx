@@ -2,6 +2,7 @@ import React,{useEffect,useRef,useState} from 'react';
 import {Download,Expand,Minus,Plus,X} from 'lucide-react';
 import {mapLines,stationPositions} from './map-layout';
 import {stationLines} from './metro';
+const mapViewBox=path=>{const points=path.map(name=>stationPositions[name]).filter(Boolean);if(!points.length)return '0 0 1436 1780';const xs=points.map(point=>point[0]),ys=points.map(point=>point[1]),minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys),pad=Math.max(120,Math.min(260,Math.max(maxX-minX,maxY-minY)*.22));return `${Math.max(0,minX-pad)} ${Math.max(0,minY-pad)} ${Math.min(1436,maxX-minX+pad*2)} ${Math.min(1780,maxY-minY+pad*2)}`};
 
 export default function RouteMap({route,from,to,language='es'}){
   const [zoom,setZoom]=useState(1),[fullscreen,setFullscreen]=useState(false);
@@ -21,7 +22,7 @@ export default function RouteMap({route,from,to,language='es'}){
       <button type="button" onClick={()=>setFullscreen(value=>!value)} title={fullscreen?(language==='en'?'Close full screen':'Cerrar pantalla completa'):(language==='en'?'Expand map':'Expandir mapa')}>{fullscreen?<X size={18}/>:<Expand size={18}/>}</button>
     </div></div>
     <div className="map-viewport" ref={viewport} onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up}>
-      <svg ref={svg} style={{width:zoom*100+'%'}} viewBox="0 0 1436 1780" role="img" aria-label={'Ruta de '+from+' a '+to}>
+      <svg ref={svg} style={{width:zoom*100+'%'}} viewBox={mapViewBox(route.path)} role="img" aria-label={'Ruta de '+from+' a '+to}>
         <rect width="1436" height="1780" fill="#f8faf5"/>
         {mapLines.map(l=><polyline key={l.id} points={l.points.map(p=>p.join(',')).join(' ')} fill="none" stroke={l.color} opacity=".22" strokeWidth="9" strokeLinejoin="round" strokeLinecap="round"/>)}
         {route.segments.map((s,i)=><polyline key={i} points={s.stations.map(n=>stationPositions[n].join(',')).join(' ')} fill="none" stroke={s.line.color} strokeWidth="13" strokeLinejoin="round" strokeLinecap="round"/>)}
