@@ -20,9 +20,20 @@ function positionAt(points,ratio){
   }
   return points.at(-1);
 }
-export const stationPoint=(line,station)=>{
+const rawStationPoint=(line,station)=>{
   const item=metrobusLines.find(entry=>entry.id===line.id||entry.id===line);
   const index=item?.stations.indexOf(station)??-1;
   return index<0?null:positionAt(traces[item.id],index/Math.max(1,item.stations.length-1));
 };
+// A transfer has one physical point on the diagram, even when two lines reach it
+// from different traces. Sharing that coordinate keeps the network connected.
+const stationPoints=new Map();
+for(const line of metrobusLines)for(const station of line.stations){
+  if(!stationPoints.has(station))stationPoints.set(station,rawStationPoint(line,station));
+}
+export const stationPoint=(line,station)=>stationPoints.get(station)??rawStationPoint(line,station);
 export const segmentPoints=segment=>segment.stations.map(station=>stationPoint(segment.line,station)).filter(Boolean);
+export const linePoints=line=>{
+  const item=metrobusLines.find(entry=>entry.id===line.id||entry.id===line);
+  return item?item.stations.map(station=>stationPoint(item,station)).filter(Boolean):[];
+};

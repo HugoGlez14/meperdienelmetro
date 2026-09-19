@@ -11,7 +11,9 @@ export default function RouteMap({route,from,to,language='es'}){
   useEffect(()=>{const el=viewport.current;if(!el)return;const points=route.path.map(s=>stationPositions[s]);const x=points.reduce((n,a)=>n+a[0],0)/points.length*zoom,y=points.reduce((n,a)=>n+a[1],0)/points.length*zoom;el.scrollTo({left:Math.max(0,x-el.clientWidth/2),top:Math.max(0,y-el.clientHeight/2),behavior:'smooth'});},[route,zoom]);
   useEffect(()=>{if(!fullscreen)return;const previous=document.body.style.overflow;document.body.style.overflow='hidden';return()=>{document.body.style.overflow=previous}},[fullscreen]);
   function download(){const copy=svg.current.cloneNode(true);copy.setAttribute('xmlns','http://www.w3.org/2000/svg');copy.setAttribute('width','1436');copy.setAttribute('height','1780');const svgUrl=URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(copy)],{type:'image/svg+xml;charset=utf-8'})),image=new Image();image.onload=()=>{const canvas=document.createElement('canvas');canvas.width=1436;canvas.height=1780;canvas.getContext('2d').drawImage(image,0,0);URL.revokeObjectURL(svgUrl);canvas.toBlob(blob=>{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='mi-ruta-metro-cdmx.png';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),0)},'image/png')};image.src=svgUrl}
-  function down(e){const el=viewport.current;drag.current={x:e.clientX,y:e.clientY,left:el.scrollLeft,top:el.scrollTop};el.setPointerCapture(e.pointerId)}
+  // On touch screens the map must not capture the gesture: vertical swipes are
+  // reserved for scrolling the page. Mouse/trackpad dragging still pans it.
+  function down(e){if(e.pointerType==='touch')return;const el=viewport.current;drag.current={x:e.clientX,y:e.clientY,left:el.scrollLeft,top:el.scrollTop};el.setPointerCapture(e.pointerId)}
   function move(e){if(!drag.current)return;const el=viewport.current;el.scrollLeft=drag.current.left-(e.clientX-drag.current.x);el.scrollTop=drag.current.top-(e.clientY-drag.current.y)}
   function up(){drag.current=null}
   return <div className={'network-map'+(fullscreen?' map-fullscreen':'')}>
